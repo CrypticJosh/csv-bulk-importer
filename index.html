@@ -1,17 +1,1288 @@
-CSV Bulk Importer
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8">
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
 
-CSV Bulk Importer is a Google Sheets add-on designed to make importing multiple CSV files quick and easy.
+<meta
+name="description"
+content="CSV Bulk Importer makes it easy to combine multiple CSV files and import them into Google Sheets."
 
-Features
-Import multiple CSV files at once
-Drag and drop CSV files
-Choose the destination Google Sheets tab
-Append CSV files together automatically
-Keep the header from the first CSV file
-Developer
+<title>CSV Bulk Importer — Import CSVs into Google Sheets</title> <style>
+:root {
+  --green: #0f9d58;
+  --green-dark: #087f45;
+  --blue: #1a73e8;
+  --dark: #17202a;
+  --muted: #667085;
+  --light: #f7f9fc;
+  --border: #e4e7ec;
+  --white: #ffffff;
+  --shadow:
+    0 12px 40px rgba(16, 24, 40, 0.08);
+}
 
-CSV Bulk Importer is independently developed as a utility for Google Sheets.
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-Support
+body {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
 
-For support regarding this application, please contact the developer using the email address associated with the Google Workspace Marketplace listing.
+  color: var(--dark);
+  background: var(--white);
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.container {
+  width: min(1120px, 92%);
+  margin: auto;
+}
+
+/* NAVIGATION */
+
+nav {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.92);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(
+    135deg,
+    var(--green),
+    #34a853
+  );
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow:
+    0 5px 15px rgba(15,157,88,.25);
+}
+
+.nav-links {
+  display: flex;
+  gap: 28px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.nav-links a:hover {
+  color: var(--dark);
+}
+
+/* HERO */
+
+.hero {
+  padding: 90px 0 80px;
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      #e9f8f0 0%,
+      #ffffff 48%
+    );
+  text-align: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #e9f8f0;
+  color: var(--green-dark);
+  padding: 7px 13px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 22px;
+}
+
+.hero h1 {
+  font-size: clamp(42px, 6vw, 70px);
+  line-height: 1.05;
+  letter-spacing: -2.5px;
+  max-width: 850px;
+  margin: auto;
+}
+
+.hero h1 span {
+  color: var(--green);
+}
+
+.hero p {
+  max-width: 650px;
+  margin: 25px auto 32px;
+  color: var(--muted);
+  font-size: 19px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px;
+  border-radius: 7px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: .2s;
+}
+
+.button-primary {
+  background: var(--green);
+  color: white;
+  box-shadow:
+    0 5px 15px rgba(15,157,88,.25);
+}
+
+.button-primary:hover {
+  background: var(--green-dark);
+  transform: translateY(-1px);
+}
+
+.button-secondary {
+  border: 1px solid var(--border);
+  background: white;
+}
+
+.button-secondary:hover {
+  background: var(--light);
+}
+
+/* PRODUCT MOCKUP */
+
+.mockup-wrapper {
+  margin: 60px auto 0;
+  max-width: 900px;
+}
+
+.mockup {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  text-align: left;
+}
+
+.mockup-top {
+  height: 42px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 15px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d0d5dd;
+}
+
+.sheet-body {
+  padding: 25px;
+}
+
+.sheet-menu {
+  display: inline-block;
+  background: #e9f8f0;
+  color: var(--green-dark);
+  padding: 7px 11px;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.sheet-grid {
+  display: grid;
+  grid-template-columns:
+    160px 220px 140px;
+  border: 1px solid var(--border);
+}
+
+.cell {
+  padding: 9px 12px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.cell.header {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+
+/* FEATURES */
+
+section {
+  padding: 90px 0;
+}
+
+.section-heading {
+  text-align: center;
+  max-width: 650px;
+  margin: auto auto 50px;
+}
+
+.section-heading h2 {
+  font-size: 36px;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+
+.section-heading p {
+  color: var(--muted);
+}
+
+.features {
+  display: grid;
+  grid-template-columns:
+    repeat(3, 1fr);
+  gap: 20px;
+}
+
+.feature {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 27px;
+  background: white;
+  transition: .2s;
+}
+
+.feature:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+}
+
+.feature-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 9px;
+  background: #e9f8f0;
+  color: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 17px;
+}
+
+.feature h3 {
+  margin-bottom: 8px;
+  font-size: 17px;
+}
+
+.feature p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* CSV DEMO */
+
+.demo-section {
+  background: var(--light);
+}
+
+.demo {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 30px;
+  box-shadow: var(--shadow);
+}
+
+.drop-zone {
+  border: 2px dashed #c7d0d9;
+  border-radius: 10px;
+  padding: 42px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.drop-zone:hover,
+.drop-zone.dragging {
+  border-color: var(--green);
+  background: #f2fbf6;
+}
+
+.drop-zone strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 5px;
+}
+
+.drop-zone span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+#csvInput {
+  display: none;
+}
+
+.file-info {
+  margin-top: 15px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.table-wrapper {
+  margin-top: 25px;
+  overflow-x: auto;
+  display: none;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+th,
+td {
+  border: 1px solid var(--border);
+  padding: 9px 11px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  background: #f8f9fa;
+  font-weight: 600;
+}
+
+/* PRIVACY */
+
+.privacy {
+  max-width: 750px;
+  margin: auto;
+  text-align: center;
+}
+
+.privacy p {
+  color: var(--muted);
+  margin-top: 12px;
+}
+
+/* FOOTER */
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 35px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 750px) {
+
+  .nav-links {
+    display: none;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding-top: 65px;
+  }
+
+  .sheet-grid {
+    grid-template-columns:
+      120px 160px 100px;
+    overflow-x: auto;
+  }
+
+  section {
+    padding: 65px 0;
+  }
+
+}
+
+</style> </head> <body> <!-- NAV --> <nav>
+<div class="container nav-inner">
+
+  <a class="logo" href="#">
+
+    <div class="logo-icon">
+      ↗
+    </div>
+
+    CSV Bulk Importer
+
+  </a>
+
+  <div class="nav-links">
+
+    <a href="#features">
+      Features
+    </a>
+
+    <a href="#demo">
+      Demo
+    </a>
+
+    <a href="#privacy">
+      Privacy
+    </a>
+
+  </div>
+
+</div>
+
+</nav> <!-- HERO --> <header class="hero">
+<div class="container">
+
+  <div class="badge">
+    ✓ Built for Google Sheets
+  </div>
+
+  <h1>
+    Import CSVs.
+    <span>All at once.</span>
+  </h1>
+
+  <p>
+    Bulk import multiple CSV files into Google Sheets,
+    choose your destination tab, and append everything
+    together in seconds.
+  </p>
+
+  <div class="buttons">
+
+    <a
+      class="button button-primary"
+      href="#demo"
+    >
+      Try the CSV Demo
+    </a>
+
+    <a
+      class="button button-secondary"
+      href="#features"
+    >
+      See Features
+    </a>
+
+  </div>
+
+  <!-- PRODUCT MOCKUP -->
+
+  <div class="mockup-wrapper">
+
+    <div class="mockup">
+
+      <div class="mockup-top">
+
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+
+      </div>
+
+      <div class="sheet-body">
+
+        <div class="sheet-menu">
+          CSV Import → Bulk Import CSVs
+        </div>
+
+        <div class="sheet-grid">
+
+          <div class="cell header">
+            Name
+          </div>
+
+          <div class="cell header">
+            Email
+          </div>
+
+          <div class="cell header">
+            Amount
+          </div>
+
+          <div class="cell">
+            John Smith
+          </div>
+
+          <div class="cell">
+            john@example.com
+          </div>
+
+          <div class="cell">
+            £120
+          </div>
+
+          <div class="cell">
+            Sarah Jones
+          </div>
+
+          <div class="cell">
+            sarah@example.com
+          </div>
+
+          <div class="cell">
+            £240
+          </div>
+
+          <div class="cell">
+            Mike Brown
+          </div>
+
+          <div class="cell">
+            mike@example.com
+          </div>
+
+          <div class="cell">
+            £180
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</header> <!-- FEATURES --> <section id="features">
+<div class="container">
+
+  <div class="section-heading">
+
+    <h2>
+      Simple by design.
+    </h2>
+
+    <p>
+      Everything you need to get CSV data
+      into your spreadsheet without the tedious
+      copy-and-paste process.
+    </p>
+
+  </div>
+
+  <div class="features">
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        ↑
+      </div>
+
+      <h3>
+        Bulk Import
+      </h3>
+
+      <p>
+        Select multiple CSV files at once and
+        combine them automatically.
+      </p>
+
+    </div>
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        ↕
+      </div>
+
+      <h3>
+        Drag & Drop
+      </h3>
+
+      <p>
+        Simply drag your CSV files into the
+        importer and let it do the work.
+      </p>
+
+    </div>
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        ▣
+      </div>
+
+      <h3>
+        Choose Your Tab
+      </h3>
+
+      <p>
+        Select exactly which Google Sheets
+        tab should receive your imported data.
+      </p>
+
+    </div>
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        +
+      </div>
+
+      <h3>
+        Append Automatically
+      </h3>
+
+      <p>
+        Files are appended underneath existing
+        data instead of overwriting your sheet.
+      </p>
+
+    </div>
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        ✓
+      </div>
+
+      <h3>
+        Smart Headers
+      </h3>
+
+      <p>
+        The first CSV supplies the header.
+        Duplicate headers from subsequent files
+        are automatically removed.
+      </p>
+
+    </div>
+
+    <div class="feature">
+
+      <div class="feature-icon">
+        ⚡
+      </div>
+
+      <h3>
+        Built for Sheets
+      </h3>
+
+      <p>
+        Runs directly from the Google Sheets
+        Extensions menu.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+</section> <!-- CSV DEMO --> <section id="demo" class="demo-section" >
+<div class="container">
+
+  <div class="section-heading">
+
+    <h2>
+      Try it with a CSV
+    </h2>
+
+    <p>
+      Drop a CSV below and preview its contents
+      directly in your browser.
+    </p>
+
+  </div>
+
+  <div class="demo">
+
+    <label
+      class="drop-zone"
+      id="dropZone"
+      for="csvInput"
+    >
+
+      <strong>
+        Drop a CSV file here
+      </strong>
+
+      <span>
+        or click to choose a file
+      </span>
+
+    </label>
+
+    <input
+      id="csvInput"
+      type="file"
+      accept=".csv,text/csv"
+    >
+
+    <div
+      id="fileInfo"
+      class="file-info"
+    ></div>
+
+    <div
+      id="tableWrapper"
+      class="table-wrapper"
+    >
+
+      <table id="csvTable"></table>
+
+    </div>
+
+  </div>
+
+</div>
+
+</section> <!-- PRIVACY --> <section id="privacy">
+<div class="container">
+
+  <div class="privacy">
+
+    <h2>
+      Privacy
+    </h2>
+
+    <p>
+      CSV Bulk Importer processes selected CSV files
+      for the purpose of importing them into Google Sheets.
+      The website demo processes files locally in your
+      browser and does not upload CSV data to a server.
+    </p>
+
+    <p>
+      The Google Sheets add-on only operates on the
+      spreadsheet you are actively using and requires
+      authorization from Google.
+    </p>
+
+  </div>
+
+</div>
+
+</section> <!-- FOOTER --> <footer>
+<div class="container footer-inner">
+
+  <div>
+    © 2026 CSV Bulk Importer
+  </div>
+
+  <div>
+    Built for Google Sheets
+  </div>
+
+</div>
+
+</footer> <script>
+const input =
+document.getElementById(
+"csvInput"
+);
+
+const dropZone =
+document.getElementById(
+"dropZone"
+);
+
+const tableWrapper =
+document.getElementById(
+"tableWrapper"
+);
+
+const table =
+document.getElementById(
+"csvTable"
+);
+
+const fileInfo =
+document.getElementById(
+"fileInfo"
+);
+
+/*
+
+File picker
+*/
+input.addEventListener(
+"change",
+function(event) {
+
+  if (
+    event.target.files.length
+  ) {
+
+    handleFile(
+      event.target.files[0]
+    );
+
+  }
+
+}
+
+);
+
+/*
+
+Drag over
+*/
+dropZone.addEventListener(
+"dragover",
+function(event) {
+
+  event.preventDefault();
+
+  dropZone.classList.add(
+    "dragging"
+  );
+
+}
+
+);
+
+/*
+
+Drag leave
+*/
+dropZone.addEventListener(
+"dragleave",
+function() {
+
+  dropZone.classList.remove(
+    "dragging"
+  );
+
+}
+
+);
+
+/*
+
+Drop
+*/
+dropZone.addEventListener(
+"drop",
+function(event) {
+
+  event.preventDefault();
+
+  dropZone.classList.remove(
+    "dragging"
+  );
+
+
+  const files =
+    event.dataTransfer.files;
+
+
+  if (files.length) {
+
+    handleFile(
+      files[0]
+    );
+
+  }
+
+}
+
+);
+
+/*
+
+Read CSV
+*/
+function handleFile(file) {
+
+if (
+  !file.name
+    .toLowerCase()
+    .endsWith(".csv")
+) {
+
+  fileInfo.innerText =
+    "Please select a CSV file.";
+
+  return;
+
+}
+
+fileInfo.innerText =
+  "Loading " +
+  file.name +
+  "…";
+
+const reader =
+  new FileReader();
+
+reader.onload =
+  function(event) {
+
+    const text =
+      event.target.result;
+
+    renderCsv(
+      text
+    );
+
+    fileInfo.innerText =
+      file.name +
+      " • " +
+      formatBytes(
+        file.size
+      );
+
+  };
+
+reader.onerror =
+  function() {
+
+    fileInfo.innerText =
+      "Unable to read the file.";
+
+  };
+
+
+reader.readAsText(
+  file
+);
+
+}
+
+/*
+
+Render CSV
+*/
+function renderCsv(text) {
+
+const rows =
+  parseCsv(text);
+
+table.innerHTML = "";
+
+if (
+  rows.length === 0
+) {
+
+  tableWrapper.style.display =
+    "none";
+
+  return;
+
+}
+
+const header =
+  document.createElement(
+    "thead"
+  );
+
+const headerRow =
+  document.createElement(
+    "tr"
+  );
+
+rows[0].forEach(
+  function(cell) {
+
+    const th =
+      document.createElement(
+        "th"
+      );
+
+    th.textContent =
+      cell;
+
+    headerRow.appendChild(
+      th
+    );
+
+  }
+);
+
+header.appendChild(
+  headerRow
+);
+
+table.appendChild(
+  header
+);
+
+const body =
+  document.createElement(
+    "tbody"
+  );
+
+rows
+  .slice(1, 101)
+  .forEach(
+    function(row) {
+
+      const tr =
+        document.createElement(
+          "tr"
+        );
+
+      row.forEach(
+        function(cell) {
+
+          const td =
+            document.createElement(
+              "td"
+            );
+
+          td.textContent =
+            cell;
+
+          tr.appendChild(
+            td
+          );
+
+        }
+      );
+
+      body.appendChild(
+        tr
+      );
+
+    }
+  );
+
+table.appendChild(
+  body
+);
+
+tableWrapper.style.display =
+  "block";
+
+}
+
+/*
+
+Simple CSV parser.
+Handles quoted commas,
+quotes and new lines.
+*/
+function parseCsv(text) {
+
+const rows = [];
+
+let row = [];
+
+let cell = "";
+
+let insideQuotes = false;
+
+for (
+  let i = 0;
+  i < text.length;
+  i++
+) {
+
+  const char =
+    text[i];
+
+  const next =
+    text[i + 1];
+
+  if (
+    char === '"' &&
+    insideQuotes &&
+    next === '"'
+  ) {
+
+    cell += '"';
+
+    i++;
+
+  }
+
+  else if (
+    char === '"'
+  ) {
+
+    insideQuotes =
+      !insideQuotes;
+
+  }
+
+  else if (
+    char === "," &&
+    !insideQuotes
+  ) {
+
+    row.push(
+      cell
+    );
+
+    cell = "";
+
+  }
+
+  else if (
+    (
+      char === "\n" ||
+      char === "\r"
+    ) &&
+    !insideQuotes
+  ) {
+
+    if (
+      char === "\r" &&
+      next === "\n"
+    ) {
+      i++;
+    }
+
+    row.push(
+      cell
+    );
+
+    if (
+      row.some(
+        value =>
+          value.trim() !== ""
+      )
+    ) {
+
+      rows.push(
+        row
+      );
+
+    }
+
+    row = [];
+
+    cell = "";
+
+  }
+
+  else {
+
+    cell += char;
+
+  }
+
+}
+
+if (
+  cell !== "" ||
+  row.length > 0
+) {
+
+  row.push(
+    cell
+  );
+
+  if (
+    row.some(
+      value =>
+        value.trim() !== ""
+    )
+  ) {
+
+    rows.push(
+      row
+    );
+
+  }
+
+}
+
+
+return rows;
+
+}
+
+/*
+
+Format file size
+*/
+function formatBytes(bytes) {
+
+if (
+  bytes === 0
+) {
+  return "0 Bytes";
+}
+
+const units = [
+  "Bytes",
+  "KB",
+  "MB",
+  "GB"
+];
+
+const i =
+  Math.floor(
+    Math.log(bytes) /
+    Math.log(1024)
+  );
+
+return (
+  parseFloat(
+    (
+      bytes /
+      Math.pow(
+        1024,
+        i
+      )
+    ).toFixed(1)
+  ) +
+  " " +
+  units[i]
+);
+
+}
+
+</script> </body> </html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html> <html> <head> <base target="_top"> <style> * { box-sizing: border-box; } body { font-family: Arial, sans-serif; padding: 24px; color: #202124; margin: 0; } h2 { margin: 0 0 8px 0; font-size: 22px; } .description { color: #5f6368; margin-bottom: 22px; } /* Destination */ label { display: block; font-weight: 600; margin-bottom: 7px; } select { width: 100%; padding: 11px; border: 1px solid #dadce0; border-radius: 5px; background: white; font-size: 14px; margin-bottom: 20px; } /* Drop zone */ .drop-zone { border: 2px dashed #c4c7c5; border-radius: 10px; padding: 35px 20px; text-align: center; background: #f8f9fa; transition: all 0.2s; cursor: pointer; } .drop-zone:hover { border-color: #1a73e8; background: #f1f6fe; } .drop-zone.dragover { border-color: #1a73e8; background: #e8f0fe; transform: scale(1.01); } .drop-icon { font-size: 40px; margin-bottom: 10px; } .drop-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; } .drop-subtitle { color: #5f6368; font-size: 13px; } #fileInput { display: none; } /* File list */ .file-list { margin-top: 15px; max-height: 130px; overflow-y: auto; border: 1px solid #dadce0; border-radius: 6px; display: none; } .file-item { padding: 8px 12px; border-bottom: 1px solid #eee; font-size: 13px; display: flex; justify-content: space-between; } .file-item:last-child { border-bottom: none; } .file-size { color: #80868b; } /* Button */ .button-container { margin-top: 20px; text-align: right; } button { background: #1a73e8; color: white; border: none; border-radius: 5px; padding: 11px 22px; font-size: 14px; font-weight: 500; cursor: pointer; } button:hover { background: #1557b0; } button:disabled { background: #bdc1c6; cursor: not-allowed; } /* Progress */ .progress-container { display: none; margin-top: 22px; } .progress-header { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 13px; } .progress-bar-background { width: 100%; height: 12px; background: #e8eaed; border-radius: 10px; overflow: hidden; } .progress-bar { width: 0%; height: 100%; background: #1a73e8; border-radius: 10px; transition: width 0.25s ease; } .progress-status { margin-top: 8px; color: #5f6368; font-size: 12px; } /* Result */ #status { margin-top: 18px; font-size: 14px; white-space: pre-line; } .success { color: #188038; } .error { color: #d93025; } </style> </head> <body> <h2>Bulk Import CSVs</h2> <div class="description"> Select a destination tab, then drag and drop your CSV files below. They will be appended together. </div> <!-- Destination --> <label for="destination"> Destination tab </label> <select id="destination"> <option value=""> Loading sheets... </option> </select> <!-- Drop zone --> <div id="dropZone" class="drop-zone" >
+<div class="drop-icon">
+  📁
+</div>
+
+<div class="drop-title">
+  Drag & Drop CSV files here
+</div>
+
+<div class="drop-subtitle">
+  or click here to choose files from your computer
+</div>
+
+<input
+  type="file"
+  id="fileInput"
+  accept=".csv,text/csv"
+  multiple
+>
+
+</div> <!-- Selected files --> <div id="fileList" class="file-list" ></div> <!-- Progress --> <div id="progressContainer" class="progress-container" >
+<div class="progress-header">
+
+  <span>
+    Import progress
+  </span>
+
+  <span id="progressPercent">
+    0%
+  </span>
+
+</div>
+
+<div class="progress-bar-background">
+
+  <div
+    id="progressBar"
+    class="progress-bar"
+  ></div>
+
+</div>
+
+<div
+  id="progressStatus"
+  class="progress-status"
+>
+  Preparing...
+</div>
+
+</div> <!-- Button --> <div class="button-container">
+<button
+  id="importButton"
+  disabled
+  onclick="importFiles()"
+>
+  Import CSVs
+</button>
+
+</div> <div id="status"></div> <script> let selectedFiles = []; /* * Load destination sheets. */ google.script.run .withSuccessHandler(function(sheetNames) { const select = document.getElementById('destination'); select.innerHTML = ''; sheetNames.forEach(function(name) { const option = document.createElement('option'); option.value = name; option.textContent = name; select.appendChild(option); }); }) .withFailureHandler(function(error) { document.getElementById('destination').innerHTML = '<option>Error loading sheets</option>'; }) .getSheetNames(); /* * Drop zone. */ const dropZone = document.getElementById('dropZone'); const fileInput = document.getElementById('fileInput'); dropZone.addEventListener( 'click', function() { fileInput.click(); } ); fileInput.addEventListener( 'change', function(event) { addFiles(event.target.files); } ); dropZone.addEventListener( 'dragover', function(event) { event.preventDefault(); dropZone.classList.add('dragover'); } ); dropZone.addEventListener( 'dragleave', function() { dropZone.classList.remove('dragover'); } ); dropZone.addEventListener( 'drop', function(event) { event.preventDefault(); dropZone.classList.remove('dragover'); addFiles(event.dataTransfer.files); } ); /* * Add files to selected list. */ function addFiles(files) { const newFiles = Array.from(files).filter(function(file) { return file.name .toLowerCase() .endsWith('.csv'); }); selectedFiles = selectedFiles.concat(newFiles); displayFiles(); } /* * Display selected files. */ function displayFiles() { const list = document.getElementById('fileList'); const button = document.getElementById('importButton'); list.innerHTML = ''; if (selectedFiles.length === 0) { list.style.display = 'none'; button.disabled = true; return; } list.style.display = 'block'; selectedFiles.forEach(function(file, index) { const item = document.createElement('div'); item.className = 'file-item'; item.innerHTML = '<span>' + (index + 1) + '. ' + escapeHtml(file.name) + '</span>' + '<span class="file-size">' + formatBytes(file.size) + '</span>'; list.appendChild(item); }); button.disabled = false; } /* * Import files. */ async function importFiles() { const destination = document.getElementById('destination').value; if (!destination) { showError( 'Please select a destination tab.' ); return; } if (selectedFiles.length === 0) { showError( 'Please select at least one CSV file.' ); return; } const button = document.getElementById('importButton'); button.disabled = true; button.innerText = 'Importing...'; document.getElementById( 'progressContainer' ).style.display = 'block'; updateProgress( 0, 'Reading CSV files...' ); try { const files = []; /* * Read each file. */ for ( let i = 0; i < selectedFiles.length; i++ ) { const file = selectedFiles[i]; updateProgress( Math.round( (i / selectedFiles.length) * 50 ), 'Reading ' + (i + 1) + ' of ' + selectedFiles.length + ': ' + file.name ); const data = await readFile(file); files.push({ name: file.name, data: data }); } updateProgress( 55, 'Sending files to Google Sheets...' ); /* * Send files to Apps Script. */ google.script.run .withSuccessHandler(function(result) { updateProgress( 100, 'Import complete!' ); document.getElementById('status') .className = 'success'; document.getElementById('status') .innerText = 'Import complete!\n\n' + 'Files imported: ' + result.filesImported + '\n' + 'Rows imported: ' + result.rowsImported + '\n' + 'Destination: ' + result.sheetName; button.innerText = 'Done'; }) .withFailureHandler(function(error) { showError( 'Import failed:\n\n' + error.message ); button.disabled = false; button.innerText = 'Try Again'; }) .processCsvFiles( files, destination ); } catch (error) { showError( 'Could not read the files:\n\n' + error.message ); button.disabled = false; button.innerText = 'Try Again'; } } /* * Read a local file. */ function readFile(file) { return new Promise( function(resolve, reject) { const reader = new FileReader(); reader.onload = function(event) { resolve( event.target.result ); }; reader.onerror = function() { reject( new Error( 'Could not read ' + file.name ) ); }; reader.readAsText(file); } ); } /* * Progress bar. */ function updateProgress( percent, message ) { document.getElementById( 'progressBar' ).style.width = percent + '%'; document.getElementById( 'progressPercent' ).innerText = percent + '%'; document.getElementById( 'progressStatus' ).innerText = message; } /* * Error message. */ function showError(message) { const status = document.getElementById('status'); status.className = 'error'; status.innerText = message; } /* * File size formatting. */ function formatBytes(bytes) { if (bytes === 0) { return '0 Bytes'; } const units = [ 'Bytes', 'KB', 'MB', 'GB' ]; const i = Math.floor( Math.log(bytes) / Math.log(1024) ); return ( parseFloat( (bytes / Math.pow(1024, i)) .toFixed(1) ) + ' ' + units[i] ); } /* * Prevent HTML injection in filenames. */ function escapeHtml(text) { const div = document.createElement('div'); div.textContent = text; return div.innerHTML; } </script> </body> </html>

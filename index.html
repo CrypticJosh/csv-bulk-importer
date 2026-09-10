@@ -3,7 +3,7 @@
 name="description"
 content="CSV Bulk Importer is a Google Sheets add-on that lets you bulk import, combine and append multiple CSV files into your spreadsheet."
 
-<meta name="theme-color" content="#0f9d58"> <title>CSV Bulk Importer — Bulk Import CSVs into Google Sheets</title> <style> :root { --green: #0f9d58; --green-dark: #087f45; --green-light: #e9f8f0; --blue: #1a73e8; --dark: #17202a; --text: #344054; --muted: #667085; --light: #f7f9fc; --border: #e4e7ec; --white: #ffffff; --shadow: 0 20px 60px rgba(16, 24, 40, .10); --shadow-small: 0 8px 25px rgba(16, 24, 40, .07); }
+<meta name="theme-color" content="#0f9d58"> <title>CSV Bulk Importer — Bulk Import CSVs into Google Sheets</title> <style> :root { --green: #0f9d58; --green-dark: #087f45; --green-light: #e9f8f0; --dark: #17202a; --text: #344054; --muted: #667085; --light: #f7f9fc; --border: #e4e7ec; --white: #ffffff; --shadow: 0 20px 60px rgba(16, 24, 40, .10); --shadow-small: 0 8px 25px rgba(16, 24, 40, .07); }
 * {
   box-sizing: border-box;
   margin: 0;
@@ -103,12 +103,15 @@ nav {
 .nav-button {
   background: var(--green);
   color: white !important;
-  padding: 9px 15px;
+  padding: 9px 17px;
   border-radius: 7px;
+  font-weight: 650;
+  box-shadow: 0 4px 12px rgba(15, 157, 88, .18);
 }
 
 .nav-button:hover {
   background: var(--green-dark);
+  transform: translateY(-1px);
 }
 
 /* HERO */
@@ -610,6 +613,7 @@ tr:last-child td {
 
 .cta .button:hover {
   background: #f5fff9;
+  transform: translateY(-2px);
 }
 
 /* FOOTER */
@@ -701,7 +705,15 @@ footer {
     <a href="#how-it-works">How It Works</a>
     <a href="#demo">Demo</a>
     <a href="support.html">Support</a>
-    <a class="nav-button" href="#demo">Try Demo</a>
+
+    <a
+      class="nav-button"
+      href="https://workspace.google.com/marketplace/app/csv_bulk_importer/689264444917"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Install
+    </a>
   </div>
 
 </div>
@@ -711,7 +723,7 @@ footer {
 
   <div class="badge">
     <span class="badge-dot"></span>
-    Built for Google Sheets
+    Available for Google Sheets
   </div>
 
   <h1>
@@ -728,12 +740,20 @@ footer {
 
   <div class="buttons">
 
-    <a class="button button-primary" href="#demo">
-      Try the CSV Demo
+    <a
+      class="button button-primary"
+      href="https://workspace.google.com/marketplace/app/csv_bulk_importer/689264444917"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Add to Google Sheets
     </a>
 
-    <a class="button button-secondary" href="#features">
-      Explore Features
+    <a
+      class="button button-secondary"
+      href="#demo"
+    >
+      Try the Demo
     </a>
 
   </div>
@@ -748,6 +768,7 @@ footer {
         <div class="dot"></div>
         <div class="dot"></div>
         <div class="dot"></div>
+
         <div class="mockup-title">
           Google Sheets — Sales Data
         </div>
@@ -1102,9 +1123,11 @@ footer {
 
   <a
     class="button"
-    href="#demo"
+    href="https://workspace.google.com/marketplace/app/csv_bulk_importer/689264444917"
+    target="_blank"
+    rel="noopener noreferrer"
   >
-    Try the CSV Demo
+    Add to Google Sheets
   </a>
 
 </div>
@@ -1136,7 +1159,7 @@ footer {
 
 </footer> <script>
 const input =
-document.getElementById("csvInput");
+document.getElementById(" csvInput");
 
 const dropZone =
 document.getElementById("dropZone");
@@ -1153,25 +1176,17 @@ document.getElementById("fileInfo");
 const previewNote =
 document.getElementById("previewNote");
 
-/* File picker */
-
 input.addEventListener(
 "change",
 function(event) {
 
   if (event.target.files.length) {
-
-    handleFile(
-      event.target.files[0]
-    );
-
+    handleFile(event.target.files[0]);
   }
 
 }
 
 );
-
-/* Drag over */
 
 dropZone.addEventListener(
 "dragover",
@@ -1179,29 +1194,21 @@ function(event) {
 
   event.preventDefault();
 
-  dropZone.classList.add(
-    "dragging"
-  );
+  dropZone.classList.add("dragging");
 
 }
 
 );
-
-/* Drag leave */
 
 dropZone.addEventListener(
 "dragleave",
 function() {
 
-  dropZone.classList.remove(
-    "dragging"
-  );
+  dropZone.classList.remove("dragging");
 
 }
 
 );
-
-/* Drop */
 
 dropZone.addEventListener(
 "drop",
@@ -1209,24 +1216,18 @@ function(event) {
 
   event.preventDefault();
 
-  dropZone.classList.remove(
-    "dragging"
-  );
+  dropZone.classList.remove("dragging");
 
   const files =
     event.dataTransfer.files;
 
   if (files.length) {
-
     handleFile(files[0]);
-
   }
 
 }
 
 );
-
-/* Read CSV */
 
 function handleFile(file) {
 
@@ -1244,9 +1245,7 @@ if (
 }
 
 fileInfo.innerText =
-  "Loading " +
-  file.name +
-  "…";
+  "Loading " + file.name + "…";
 
 const reader =
   new FileReader();
@@ -1277,8 +1276,6 @@ reader.onerror =
 reader.readAsText(file);
 
 }
-
-/* Render CSV */
 
 function renderCsv(text) {
 
@@ -1357,15 +1354,11 @@ tableWrapper.style.display =
   "block";
 
 if (rows.length > 101) {
-
   previewNote.style.display =
     "block";
-
 }
 
 }
-
-/* CSV parser */
 
 function parseCsv(text) {
 
@@ -1431,9 +1424,7 @@ for (
       char === "\r" &&
       next === "\n"
     ) {
-
       i++;
-
     }
 
     row.push(cell);
@@ -1444,9 +1435,7 @@ for (
           value.trim() !== ""
       )
     ) {
-
       rows.push(row);
-
     }
 
     row = [];
@@ -1475,9 +1464,7 @@ if (
         value.trim() !== ""
     )
   ) {
-
     rows.push(row);
-
   }
 
 }
@@ -1485,8 +1472,6 @@ if (
 return rows;
 
 }
-
-/* Format file size */
 
 function formatBytes(bytes) {
 
